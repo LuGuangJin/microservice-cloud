@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        register-enabled: true
+        ephemeral: true  # 是否临时实例（默认true，宕机自动剔除）

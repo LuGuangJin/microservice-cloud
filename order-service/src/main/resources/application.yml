@@ -1,0 +1,108 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: order-service
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  cloud:
+    inetutils:
+      preferred-networks: 192,10,172
+
+    loadbalancer:
+      enabled: true # 显式启用 LoadBalancer
+
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #  配置Nacos注册中心地址（单机版）
+#        server-addr: 192.168.1.3:8848,192.168.1.3:8858,192.168.1.3:8868 #  配置Nacos注册中心地址（集群版）
+        namespace: public
+        group: DEFAULT_GROUP
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/order_db?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#  redis:
+#    host: ${REDIS_HOST:localhost}
+#    port: 6379
+#    password: ${REDIS_PASS:}
+#    database: 2
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#seata:
+#  tx-service-group: my_tx_group
+#  service:
+#    vgroup-mapping:
+#      my_tx_group: default
+#  config:
+#    type: nacos
+#    nacos:
+#      server-addr: ${NACOS_HOST:localhost}:8848
+#      group: SEATA_GROUP
+#  registry:
+#    type: nacos
+#    nacos:
+#      server-addr: ${NACOS_HOST:localhost}:8848
+#      group: SEATA_GROUP
+
+#rocketmq:
+#  name-server: ${ROCKETMQ_HOST:localhost}:9876
+#  producer:
+#    group: order-group
+#    send-message-timeout: 3000
+
+
+# 3. 配置负载均衡策略（订单服务：application.yml）
+#user-service:
+#  ribbon:
+#    # 随机策略（可选：RoundRobinRule/WeightedResponseTimeRule）
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+
+# 为特定服务配置负载均衡策略
+#spring.cloud.loadbalancer.configurations:
+#  user-service:
+#    algorithm: random
+
+
+feign:
+  # 启用GZIP压缩
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+    response:
+      enabled: true
+  client:
+    config:
+      default:  # 全局配置
+        connectTimeout: 5000  # 连接超时(ms)
+        readTimeout: 5000     # 读取超时(ms)
+      user-service:  # 服务级配置
+        loggerLevel: full     # 日志级别（请求/响应详情）
+
+  okhttp:
+    enabled: true # 启用OkHttp
+
+# 日志配置 - 添加这部分来启用负载均衡日志
+logging:
+  level:
+    org.springframework.cloud.loadbalancer: TRACE
+    org.springframework.cloud.netflix.ribbon: DEBUG
+    com.netflix.loadbalancer: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+    com.alibaba.nacos.client.naming: DEBUG  # Nacos服务发现日志
+    tech.jabari.api.client.UserFeignClient: DEBUG  # 添加这一行，开启Feign Client的日志
+    feign.Logger: DEBUG  # 添加这一行，开启Feign日志
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

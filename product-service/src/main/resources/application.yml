@@ -1,0 +1,40 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: product-service
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:8848
+        namespace: ${NACOS_NAMESPACE:public}
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/product_db?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#  redis:
+#    host: ${REDIS_HOST:localhost}
+#    port: 6379
+#    password: ${REDIS_PASS:}
+#    database: 1
+#  elasticsearch:
+#    rest:
+#      uris: ${ES_HOST:http://localhost:9200}
+#      username: ${ES_USER:}
+#      password: ${ES_PASS:}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+product:
+  cache:
+    timeout: 3600 # 1小时
