@@ -6,15 +6,15 @@ import org.springframework.cloud.client.loadbalancer.DefaultResponse;
 import org.springframework.cloud.client.loadbalancer.EmptyResponse;
 import org.springframework.cloud.client.loadbalancer.Request;
 import org.springframework.cloud.client.loadbalancer.Response;
-import org.springframework.cloud.loadbalancer.core.ReactorLoadBalancer;
+import org.springframework.cloud.loadbalancer.core.ReactorServiceInstanceLoadBalancer;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import reactor.core.publisher.Mono;
-import tech.jabari.order.util.WeightedRandomUtils;
+import tech.jabari.order.util.SmoothedWeightedRandomUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NacosWeightedLoadBalancer implements ReactorLoadBalancer<ServiceInstance> {
+public class NacosWeightedLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 
     private final ObjectProvider<ServiceInstanceListSupplier> supplierProvider;
     private final String serviceId;
@@ -49,7 +49,11 @@ public class NacosWeightedLoadBalancer implements ReactorLoadBalancer<ServiceIns
                         Double.parseDouble(instance.getMetadata().getOrDefault("nacos.weight", "1"))
                     )
                     .toArray();
-                int index = WeightedRandomUtils.choose(weights);
+                // 遍历weights
+                System.out.printf("------weights length: %d, weights: %s \n" , weights.length,java.util.Arrays.toString(weights));
+//                int index = WeightedRandomUtils.choose(weights);
+                int index = SmoothedWeightedRandomUtils.choose(weights);
+                System.out.println("------chose index: " + index);
                 return new DefaultResponse(validInstances.get(index));
             });
     }

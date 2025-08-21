@@ -20,8 +20,8 @@
     <dependencies>
         <dependency>
             <groupId>tech.jabari</groupId>
-            <artifactId>cloud-common</artifactId>
-            <version>${project.version}</version>
+            <artifactId>cloud-api</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!-- Spring Web -->
@@ -47,12 +47,13 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+
+        <!-- Sentinel -->
         <dependency>
-            <groupId>tech.jabari</groupId>
-            <artifactId>cloud-api</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
+           <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
+
 
         <!-- Redis -->
         <!--<dependency>

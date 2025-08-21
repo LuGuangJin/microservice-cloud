@@ -21,8 +21,14 @@ spring:
         metadata:
           nacos.weight: "1.0"
 
+    sentinel:
+        transport:
+          dashboard: localhost:8858
+          port: 8719
 
-  #        weight: 1 # 服务权重，默认值： 1
+
+
+#        weight: 20 # 服务权重，默认值： 1
   #      config:
 #        server-addr: localhost:8848
 

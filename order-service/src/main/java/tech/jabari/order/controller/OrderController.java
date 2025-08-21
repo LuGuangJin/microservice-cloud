@@ -1,5 +1,7 @@
 package tech.jabari.order.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,8 +107,18 @@ public class OrderController {
      */
     @GetMapping("/{id}")
     @ApiOperation("查看订单详情")
+    @SentinelResource(
+            value = "getOrder",  // 资源名
+            blockHandler = "handleBlock"  // 限流处理方法
+    )
     public Result<OrderDetailDTO> getOrderDetail(@PathVariable Long id) {
         return Result.success(orderService.getOrderDetail(id));
+    }
+
+
+    // 限流兜底方法（参数需与原方法一致，末尾加BlockException）
+    public Result<OrderDetailDTO> handleBlock(Long id, BlockException e) {
+        return Result.fail("订单详情接口请求过于频繁，请稍后再试！");
     }
 
 

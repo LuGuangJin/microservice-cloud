@@ -20,11 +20,10 @@
     <dependencies>
         <dependency>
             <groupId>tech.jabari</groupId>
-            <artifactId>cloud-common</artifactId>
-            <version>${project.version}</version>
+            <artifactId>cloud-api</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
         </dependency>
-
-
 
 
         <!-- Nacos Discovery -->
@@ -50,11 +49,12 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+
+        <!-- Sentinel -->
         <dependency>
-            <groupId>tech.jabari</groupId>
-            <artifactId>cloud-api</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
+
     </dependencies>
 </project>

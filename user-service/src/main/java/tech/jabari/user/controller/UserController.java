@@ -1,7 +1,6 @@
 package tech.jabari.user.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.jabari.api.dto.UserDTO;
 import tech.jabari.common.result.Result;
+import tech.jabari.user.service.UserService;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+    @Autowired
+    private UserService userService;
 
     @Value("${server.port}")
     private String port;
@@ -36,12 +39,14 @@ public class UserController {
         }*/
         return Result.success(user);
     }
-    
-    @Data // Lombok注解
-    @AllArgsConstructor
-    public static class User {
-        private Long id;
-        private String name;
-        private LocalDateTime createTime;
+
+
+    @GetMapping("/info/{id}")
+    public Result<UserDTO> getUserInfo(@PathVariable Long id) {
+        System.out.printf("......用户信息接口在[%s]被调用，端口号为：%s。\n",LocalDateTime.now().toString(), port);
+        UserDTO userDTO = userService.getUserById(id);
+        return Result.success(userDTO != null ? userDTO : new UserDTO(-1L,"未找到用户名","未找到手机号"));
     }
+    
+
 }

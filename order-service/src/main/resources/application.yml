@@ -23,6 +23,25 @@ spring:
         namespace: public
         group: DEFAULT_GROUP
 
+    sentinel:
+      transport:
+        dashboard: localhost:8858  # 连接Sentinel Dashboard地址
+        port: 8719  # 客户端与Dashboard通信的端口（默认8719，如被占用会自动+1）
+      # 可选：配置规则持久化到Nacos（防止重启丢失）
+      datasource:
+        ds1: # 流控规则
+          nacos:
+            server-addr: localhost:8848  # Nacos地址
+            dataId: ${spring.application.name}-sentinel-flow
+            groupId: DEFAULT_GROUP
+            rule-type: flow  # 规则类型（flow：流控，degrade：熔断）
+        ds2: # 熔断规则
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-sentinel-degrade
+            groupId: DEFAULT_GROUP
+            rule-type: degrade
+
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/order_db?useSSL=false&serverTimezone=Asia/Shanghai
     username: ${MYSQL_USER:root}
@@ -93,6 +112,9 @@ feign:
 
   okhttp:
     enabled: true # 启用OkHttp
+
+  sentinel:
+    enabled: true # 启用feign整合sentinel
 
 # 日志配置 - 添加这部分来启用负载均衡日志
 logging:
