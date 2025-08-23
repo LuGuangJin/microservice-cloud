@@ -22,13 +22,20 @@ spring:
           nacos.weight: "1.0"
 
     sentinel:
-        transport:
+      transport:
           dashboard: localhost:8858
           port: 8719
+      datasource:
+        degrade-rule-ds: # 数据源名称（名称：可以自定义）
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-sentinel-degrade
+            groupId: DEFAULT_GROUP
+            rule-type: degrade
 
 
 
-#        weight: 20 # 服务权重，默认值： 1
+  #        weight: 20 # 服务权重，默认值： 1
   #      config:
 #        server-addr: localhost:8848
 

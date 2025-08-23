@@ -3,11 +3,9 @@ package tech.jabari.order.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import tech.jabari.api.client.ProductFeignClient;
 import tech.jabari.api.client.UserFeignClient;
 import tech.jabari.api.dto.OrderDTO;
 import tech.jabari.api.dto.OrderDetailDTO;
@@ -27,6 +25,9 @@ public class OrderService {
 
     @Autowired
     private UserFeignClient userFeignClient;
+
+    @Autowired
+    private ProductFeignClient productFeignClient;
     
     @Autowired
     @Qualifier("loadBalancedRestTemplate")
@@ -72,25 +73,28 @@ public class OrderService {
         );*/
 
         Result<UserDTO> resultUserDTO = userFeignClient.getUser(order.getUserId());
+        if (null == resultUserDTO.getData()) {
+            throw new RuntimeException("用户服务-查询用户["+order.getUserId()+"]功能暂不可用！或<用户信息不存在!>");
+        }
         
         // 3. 调用商品服务查询商品信息
         /*Result<ProductDTO> resultProductDTO = restTemplate.getForObject(
             "http://product-service/product/" + orderDTO.getProductId(), Result.class);*/
 
-        ResponseEntity<Result<ProductDTO>> responseProduct = restTemplate.exchange(
+        /*ResponseEntity<Result<ProductDTO>> responseProduct = restTemplate.exchange(
                 "http://product-service/product/" + orderDTO.getProductId(),
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<Result<ProductDTO>>() {}
         );
-        Result<ProductDTO> resultProductDTO = responseProduct.getBody();
+        Result<ProductDTO> resultProductDTO = responseProduct.getBody();*/
+
+        Result<ProductDTO> resultProductDTO = productFeignClient.getProductById(orderDTO.getProductId());
 
         ProductDTO productDTO = resultProductDTO.getData();
         if (productDTO == null) {
-            throw new RuntimeException("商品信息不存在!");
+            throw new RuntimeException("<商品服务-查询商品["+orderDTO.getProductId()+"]功能暂不可用!>或<商品信息不存在!>");
         }
-        productDTO.setPrice(orderItems.get(0).getProductPrice());
-        productDTO.setName(orderItems.get(0).getProductName());
 
         // 4. 组装结果
 //        return new OrderDetailDTO(orderDTO, responseUser.getBody().getData(), productDTO);

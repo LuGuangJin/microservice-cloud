@@ -3,14 +3,13 @@ package tech.jabari.user.config;
 import com.alibaba.csp.sentinel.slots.block.RuleConstant;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
-import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
 // 初始化熔断规则（项目启动时执行）
-@Configuration
+//@Configuration
 public class SentinelRuleConfig {
     @PostConstruct
     public void initDegradeRules() {

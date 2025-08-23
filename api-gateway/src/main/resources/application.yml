@@ -1,0 +1,87 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:8848
+        namespace: ${NACOS_NAMESPACE:public}
+    gateway:
+      discovery:
+        locator:
+          enabled: true    # 在网关中，启用服务发现
+          lower-case-service-id: true # 服务名称转为小写
+
+      routes: # 路由配置
+#        - id: auth-service
+#          uri: lb://auth-service
+#          predicates:
+#            - Path=/auth/**
+#          filters:
+#            - StripPrefix=1
+#            - name: RequestRateLimiter
+#              args:
+#                redis-rate-limiter.replenishRate: 10
+#                redis-rate-limiter.burstCapacity: 20
+#                redis-rate-limiter.requestedTokens: 1
+        - id: user-service # 用户服务
+          uri: lb://user-service # 服务地址 ， lb: 是Load Balancer的简写，表示使用负载均衡
+          predicates:
+            - Path=/api/user/**  # 匹配路径
+          filters: # 网关过滤器
+            - StripPrefix=1 # 去掉前缀
+            - name: CustomRequestRateLimiter # 自定义的请求率限制器
+              args:
+                redis-rate-limiter.replenishRate: 1    # 令牌桶填充速率（每秒生成10个令牌）
+                redis-rate-limiter.burstCapacity: 2    # 令牌桶总容量（最多允许20个并发请求）
+                key-resolver: "#{@ipAddressKeyResolver}" # 限流键解析器（基于IP）
+
+
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=1
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=1
+    sentinel:
+      transport:
+        dashboard: localhost:8858
+      eager: true # 启动时加载规则
+      scg: # 配置Sentinel的SCG
+        fallback: # 降级处理
+          mode: response # 降级处理方式 ，response：返回自定义的响应结果 ; redirect：重定向到指定的URL
+          response-body: '{"code":429,"message":"请求过于频繁，请稍后再试！"}'
+          response-status: 429
+          content-type: application/json
+      # 日志配置（便于排查问题）
+#      log:
+#        dir: ./logs/sentinel              # 日志目录
+#        switch-pid: true                  # 日志文件名包含PID
+
+
+  redis:
+    host: localhost  # Redis服务器地址
+    port: 6379       # Redis端口
+#    password: 123456
+    database: 0      # 数据库索引
+
+jwt:
+  secret: ${JWT_SECRET:jabari-tech-secret-key}
+  token-header: Authorization
+  token-prefix: Bearer
+
+
+#开启控制台日志
+logging:
+    level:
+      root: info
+      org.springframework.cloud.gateway: debug

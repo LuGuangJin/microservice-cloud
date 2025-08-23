@@ -39,8 +39,10 @@ public class ProductController {
 
 
     public Result<ProductDTO> productBlockHandler(Long id, BlockException ex) {
-        return Result.fail("商品查询过于频繁，请稍后再试!");
+        return Result.fail(429,"商品查询过于频繁，请稍后再试!");
     }
+
+
 
 
 

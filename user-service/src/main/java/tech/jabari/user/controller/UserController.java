@@ -45,7 +45,8 @@ public class UserController {
     public Result<UserDTO> getUserInfo(@PathVariable Long id) {
         System.out.printf("......用户信息接口在[%s]被调用，端口号为：%s。\n",LocalDateTime.now().toString(), port);
         UserDTO userDTO = userService.getUserById(id);
-        return Result.success(userDTO != null ? userDTO : new UserDTO(-1L,"未找到用户名","未找到手机号"));
+//        return Result.success(userDTO != null ? userDTO : new UserDTO(-1L,"未找到用户名","未找到手机号"));
+        return Result.success(userDTO);
     }
     
 

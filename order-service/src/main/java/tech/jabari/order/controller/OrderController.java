@@ -4,6 +4,7 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.ServiceInstance;
@@ -24,6 +25,7 @@ import java.util.Random;
 @RestController
 @RequestMapping("/order")
 @Api(tags = "订单服务")
+@Slf4j
 public class OrderController {
 
     @Autowired
@@ -109,7 +111,8 @@ public class OrderController {
     @ApiOperation("查看订单详情")
     @SentinelResource(
             value = "getOrder",  // 资源名
-            blockHandler = "handleBlock"  // 限流处理方法
+            blockHandler = "handleBlock",  // 限流处理方法
+            fallback = "getOrderDetailFallback"  // 整体降级方法
     )
     public Result<OrderDetailDTO> getOrderDetail(@PathVariable Long id) {
         return Result.success(orderService.getOrderDetail(id));
@@ -118,7 +121,13 @@ public class OrderController {
 
     // 限流兜底方法（参数需与原方法一致，末尾加BlockException）
     public Result<OrderDetailDTO> handleBlock(Long id, BlockException e) {
-        return Result.fail("订单详情接口请求过于频繁，请稍后再试！");
+        return Result.fail(429,"订单详情接口请求过于频繁，请稍后再试！");
+    }
+
+    // 全链路降级兜底方法
+    public Result<OrderDetailDTO> getOrderDetailFallback(Long orderId, Throwable t) {
+        log.error("查询订单详情失败", t);
+        return Result.fail("查询订单详情服务繁忙，请稍后重试!");
     }
 
 

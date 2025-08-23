@@ -12,6 +12,7 @@
     <module>product-service</module>
     <module>order-service</module>
     <module>cloud-api</module>
+      <module>api-gateway</module>
   </modules>
 
 

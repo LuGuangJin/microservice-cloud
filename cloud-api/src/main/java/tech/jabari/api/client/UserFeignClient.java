@@ -8,7 +8,10 @@ import tech.jabari.api.dto.UserDTO;
 import tech.jabari.common.result.Result;
 
 
-@FeignClient(name = "user-service", path = "/user")
+@FeignClient(name = "user-service",
+        path = "/user",
+        fallback = UserFeignClientFallback.class // 降级处理的类
+)
 public interface UserFeignClient {
 
     @GetMapping("/{id}")
