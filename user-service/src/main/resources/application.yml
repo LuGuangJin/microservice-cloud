@@ -66,5 +66,6 @@ logging:
     org.springframework.cloud.netflix.ribbon: DEBUG
     com.netflix.loadbalancer: DEBUG
     org.springframework.web.client.RestTemplate: DEBUG
+    tech.jabari.user: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

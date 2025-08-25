@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 /**
- * 自定义请求限流过滤器工厂
+ * 自定义请求限流过滤器工厂  （局部过滤器）
  * 重写默认的RequestRateLimiterGatewayFilterFactory，提供自定义的限流响应内容。
  *
  * @author Jabari

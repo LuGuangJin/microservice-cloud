@@ -1,0 +1,70 @@
+server:
+  port: 9080
+
+spring:
+  application:
+    name: auth-service
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher  # 使用 ant_path_matcher 兼容 Springfox
+
+  # 添加以下配置以导入 Nacos 配置
+  config:
+    import:
+      - nacos:auth-service.yaml  # 根据实际 data-id 调整名称
+      - optional:nacos:common.yaml
+  cloud:
+    nacos:
+      # nacos 注册中心配置
+      discovery:
+        server-addr: ${NACOS_HOST:localhost}:8848
+        namespace: ${NACOS_NAMESPACE:public}
+      # nacos 配置中心配置
+      config:
+        server-addr: ${NACOS_HOST:localhost}:8848
+        namespace: ${NACOS_NAMESPACE:public}
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        shared-configs:
+          - data-id: common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/user_db?useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: 6379
+    password: ${REDIS_PASS:123456}
+    database: 0
+
+jwt:
+  secret: ${JWT_SECRET:jabari-tech-secret-key}
+  private-key: |-
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDSBXSp/tIkAvqgY5CnSSAobyxMbHrB3KSAwp3VxiSVNZX5I/BLvEALZrg2/MpxnZWAZ6PVQukuPucEQU3ltjrKy9gXHqeDykBiHPv17QReI19FKNb+1D90Cp+xTBl6L4mF7b2WDHgw4mNWdCv1ooKiGHWKQ23lwM67+h4/H8t9mmyGoE9iYN3VX0tjpC7Ak7ANZw5qKZiGR9Y/UyRuYYH86g+lTYYj37RbKdposAh6GQxBC3s+7eTJdAILeChyXsyX1im26p1urt2ttLAFHDODfYt+EKxlaUq3BNXwtiZfZozJr+O/5nKtSc3Jl/xFE66+p/OYMnLaaGQZAcKUtOSdAgMBAAECggEBAIah8LO5IsTrE/cVXHmgqvjAq8kiEV+NLfdMyxlrN7Be9ZEMtNIYD4Y/hv/Y9X334wq5ZZEkn46BzF4x7tm/A9lU62WGxSP612MN6YcxNYeTbVNMZuZc8YBV/yENA5gMOUCdstcpjzLnLX8SYcvJLazzuQW1TBHok551LEaS/0O4PPshX0kOrf/4ZzDTs+xiQOExGpOZ4K4xECblJFYlCgjQ8KynEuxmfVoGhbu2OLd/n7IfxrRWTWAfK5xu5AKVPiE976rzL0xhwavSKRCKmNKOY/Vtjuar9sRxE+I90Hh7oKuCCs097h0ToqF6Z9cgEIA1aK8ZvT36VILL963HYZECgYEA9KVCCenH1l353iAThdv9vPycF6gOG1M4yXaQQqoR1JSvkFa1DX5FBQ80LQEIQwZ5MIctICPy3EbRAtL0gY+ORMFYPSqfeOW+sTR0D+puJzVcq7oSwlgiuy05UcSm7Jm1pf0tRxzIxWVrIPd5I10/yDtMx+jkHHCjbxhOihNM9y8CgYEA28TP3SK3WyzF1L+WMCTGCBqOAYb5KzR2PDEfb0Me52fq+vJRNE4wxOORECFcbb5aX3sukMz0DUXYOztgCe7SxMg1VS4eksf2f5qMX9aCBTSQnQ4amba7AsaoZDKU081FTsiYBcQ8V+Fd1gGLxEBhBzJsQFnPySSr9WLHMTs9LfMCgYBdyUy7yCeYAobbpKhXVLK9VInyd7aQuyK1+QHszI3xVN7JErRt685B1kZGSnMEXuLuu6ONArsDvxI5Zu3dDU+ZBBXzvPdNvaWRAW7M+y4nUcmo+7hdULRf1UJ4Gk9zvKlqbNiCvoIpSmv7Q2PpLsJY3ILe0GVCkdvVpxfUzvleeQKBgFLQf2PdSSraXFInP/k0Ykt7djetHQfi5QsZl7bdnC+nQSz/UwpazJXlCy0A5UuVh4ijapC2KuE1iJ4Jac9UZ6gvqalHj83P/FtpaaxTsPs1K6mDPxLdgOsy4RGg3eRSXeOqQ18o63RSQIH8Yya4+9cycQhuz5YEc6gsaNNsd0lxAoGBALcf3AoT67PSe9ZS+S3I3SjAV637OXn5Qpo++5c3qF9wn+zCHc5gfdaCmRA+9qy1O35Z0pgtK63oGS43q7KU1vwBSAKbWY93bkEGkqZzRVdXPgE+nDT6XhZFjjXAqkycDOj57gJVsIYfagHFS+xb3ipC+mS3pCt9WGglNw1mZqBc
+    -----END PRIVATE KEY-----
+  expiration: ${JWT_EXPIRATION:86400} # 24小时
+  token-header: Authorization
+  token-prefix: Bearer
+
+auth:
+  excludePaths: # 无需登录校验的路径
+    - /search/**
+    - /auth/login
+    - /auth/refresh
+    - /product/**
+    - /v2/api-docs/**
+    - /v3/api-docs/**
+    - /swagger-resources/**
+    - /swagger-ui/**
+    - /webjars/**
+    - /actuator/**
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
