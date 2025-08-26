@@ -12,7 +12,8 @@ import org.springframework.context.annotation.ComponentScan;
  * 订单服务启动类
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"tech.jabari.order", "tech.jabari.common","tech.jabari.api.client"})
+//@ComponentScan(basePackages = {"tech.jabari.order", "tech.jabari.common","tech.jabari.api.client"})
+@ComponentScan(basePackages = {"tech.jabari.order","tech.jabari.common","tech.jabari.api.client"})
 @EnableDiscoveryClient // 启用服务注册与发现
 @EnableFeignClients(basePackages = {"tech.jabari.api.client"}) // 启用Feign客户端
 public class OrderApp {

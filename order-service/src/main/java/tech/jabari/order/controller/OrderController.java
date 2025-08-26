@@ -131,6 +131,17 @@ public class OrderController {
     }
 
 
+    /**
+     * 查询登录用户的订单列表信息
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("查询登录用户的订单列表信息")
+    public Result<List<OrderDetailDTO>> getOrderList() {
+        return Result.success(orderService.getOrderList());
+    }
+
+
 
 
 }

@@ -19,7 +19,7 @@ import java.util.List;
 )
 public interface UserFeignClient {
 
-    @GetMapping("/{id}")
+    @GetMapping("/info/{id}")
     public Result<UserDTO> getUser(@PathVariable("id") Long id);
 
     @PostMapping("/username")

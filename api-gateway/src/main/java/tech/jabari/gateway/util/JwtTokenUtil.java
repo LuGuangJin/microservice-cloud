@@ -37,6 +37,7 @@ public class JwtTokenUtil {
      * 从 token 中获取用户ID (Subject)
      */
     public Long getUserIdFromToken(String token) {
+        token = getTokenWOPrefix(token);
         String subject = getClaimFromToken(token, Claims::getSubject);
         return subject != null ? Long.parseLong(subject) : null;
     }
@@ -45,6 +46,7 @@ public class JwtTokenUtil {
      * 从 token 中获取用户名 (来自 Claims)
      */
     public String getUsernameFromToken(String token) {
+        token = getTokenWOPrefix(token);
         return getClaimFromToken(token, claims -> claims.get("username", String.class));
     }
 
@@ -52,14 +54,17 @@ public class JwtTokenUtil {
      * 从 token 中获取用户角色 (来自 Claims)
      */
     public String getRolesFromToken(String token) {
+        token = getTokenWOPrefix(token);
         return getClaimFromToken(token, claims -> claims.get("roles", String.class));
     }
 
     public Date getExpirationDateFromToken(String token) {
+        token = getTokenWOPrefix(token);
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        token = getTokenWOPrefix(token);
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
@@ -71,6 +76,7 @@ public class JwtTokenUtil {
      * 这里为了简单，auth-service 也使用私钥来解析。生产环境建议 auth-service 也使用公钥解析以保持一致。
      */
     private Claims getAllClaimsFromToken(String token) {
+        token = getTokenWOPrefix(token);
         // 注意：这里使用私钥来解析。对于验证来说，公钥更合适，但私钥也可以。
         // 理想情况下，auth-service 应使用公钥验证，但需要额外配置。
         return Jwts.parserBuilder()
@@ -81,6 +87,7 @@ public class JwtTokenUtil {
     }
 
     private Boolean isTokenExpired(String token) {
+        token = getTokenWOPrefix(token);
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -120,6 +127,7 @@ public class JwtTokenUtil {
      * 验证 Token 是否有效（针对特定用户）
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
+        token = getTokenWOPrefix(token);
         final String usernameFromToken = getUsernameFromToken(token);
         final String usernameFromUserDetails = userDetails.getUsername();
         return (usernameFromToken.equals(usernameFromUserDetails) && !isTokenExpired(token));
@@ -129,7 +137,19 @@ public class JwtTokenUtil {
      * 验证 Token 是否有效（不针对特定用户，只验证过期和签名）
      */
     public Boolean validateToken(String token) {
+        token = getTokenWOPrefix(token);
         return !isTokenExpired(token);
+    }
+
+    private String getTokenWOPrefix(String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith(tokenPrefix)) {
+            bearerToken = bearerToken.substring(getTokenPrefix().length());
+            System.out.println("----After trimming token prefix , token is : " + bearerToken);
+            return bearerToken;
+        } else if (bearerToken != null) {
+            return bearerToken;
+        }
+        return null;
     }
 
 /*    public String getTokenFromRequest(HttpServletRequest request) {

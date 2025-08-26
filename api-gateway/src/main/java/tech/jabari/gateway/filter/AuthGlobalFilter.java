@@ -1,9 +1,7 @@
 package tech.jabari.gateway.filter;
 
-import org.springframework.beans.factory.annotation.Value;
-import tech.jabari.gateway.config.AuthProperties;
-import tech.jabari.gateway.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -15,6 +13,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import tech.jabari.gateway.config.AuthProperties;
+import tech.jabari.gateway.util.JwtTokenUtil;
+
+import java.util.function.Consumer;
+
+import static tech.jabari.common.constant.CommonConstants.REQUEST_HEADER_USER_INFO;
 
 /**
  * 认证过滤器 （全局过滤器）
@@ -40,13 +44,23 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         }
         //2、获取token
         String token = request.getHeaders().getFirst(jwtTokenHeader);
+        System.out.println("------AuthGlobalFilter.filter(): ---> token = " + token);
         //3、校验token
         Long userId = null;
         try {
             userId = jwtTool.getUserIdFromToken(token);
-            //4、todo 传递用户信息
+            //4、传递用户信息 （保存到请求头中，传递给下游的微服务）
         	System.out.println("------AuthGlobalFilter.filter(): ---> userId = " + userId);
+            String userInfo= userId.toString();
+            ServerWebExchange webExchange= exchange.mutate ().request(
+                    new Consumer<ServerHttpRequest.Builder>() {
+                        @Override
+                        public void accept(ServerHttpRequest.Builder builder) {
+                            builder.header(REQUEST_HEADER_USER_INFO, userInfo);
+                        }
+                    }).build();
         } catch (Exception e) {
+            e.printStackTrace();
             //token校验失败
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(HttpStatus.UNAUTHORIZED);

@@ -12,11 +12,15 @@ import tech.jabari.api.dto.OrderDetailDTO;
 import tech.jabari.api.dto.ProductDTO;
 import tech.jabari.api.dto.UserDTO;
 import tech.jabari.common.result.Result;
+import tech.jabari.common.util.BeanUtils;
+import tech.jabari.common.util.CollUtils;
+import tech.jabari.common.util.UserContext;
 import tech.jabari.order.entity.Order;
 import tech.jabari.order.entity.OrderItem;
 import tech.jabari.order.mapper.OrderItemMapper;
 import tech.jabari.order.mapper.OrderMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // 2. 订单服务调用链（整合用户服务与商品服务）
@@ -99,5 +103,33 @@ public class OrderService {
         // 4. 组装结果
 //        return new OrderDetailDTO(orderDTO, responseUser.getBody().getData(), productDTO);
         return new OrderDetailDTO(orderDTO, resultUserDTO.getData(), productDTO);
+    }
+
+    public List<OrderDetailDTO> getOrderList() {
+        Long userId = UserContext.getUser();
+        QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        List<Order> orders = orderMapper.selectList(queryWrapper);
+        if (CollUtils.isEmpty( orders)) {
+            return CollUtils.emptyList();
+        }
+        // 查询用户信息
+        UserDTO userDTO = userFeignClient.getUser(userId).getData();
+        List<ProductDTO> productDTOList = new ArrayList<>();
+        List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+        for (Order order : orders) {
+            QueryWrapper<OrderItem> queryWrapperItem = new QueryWrapper<>();
+            queryWrapperItem.eq("order_id", order.getId());
+            List<OrderItem> orderItems = orderItemMapper.selectList(queryWrapperItem);
+            for (OrderItem orderItem : orderItems) {
+                // 查询商品信息
+                ProductDTO productDTO = productFeignClient.getProductById(orderItem.getProductId()).getData();
+                productDTOList.add(productDTO);
+                OrderDTO orderDTO = BeanUtils.copyBean(order, OrderDTO.class);
+                orderDTO.setProductId(orderItem.getProductId());
+                orderDetailDTOList.add(new OrderDetailDTO(orderDTO, userDTO, productDTO));
+            }
+        }
+        return orderDetailDTOList;
     }
 }

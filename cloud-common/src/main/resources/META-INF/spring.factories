@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  tech.jabari.common.config.SwaggerConfig,\
+  tech.jabari.common.config.MyBatisConfig,\
+  tech.jabari.common.config.JsonConfig,\
+  tech.jabari.common.config.MvcConfig
