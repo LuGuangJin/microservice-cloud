@@ -18,7 +18,7 @@ import tech.jabari.gateway.util.JwtTokenUtil;
 
 import java.util.function.Consumer;
 
-import static tech.jabari.common.constant.CommonConstants.REQUEST_HEADER_USER_INFO;
+import static tech.jabari.common.constant.CommonConstants.*;
 
 /**
  * 认证过滤器 （全局过滤器）
@@ -50,13 +50,20 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         try {
             userId = jwtTool.getUserIdFromToken(token);
             //4、传递用户信息 （保存到请求头中，传递给下游的微服务）
-        	System.out.println("------AuthGlobalFilter.filter(): ---> userId = " + userId);
             String userInfo= userId.toString();
+            String username = jwtTool.getUsernameFromToken(token);
+            String roles = jwtTool.getRolesFromToken(token);
+            System.out.println("------AuthGlobalFilter.filter(): ---> userId：" + userId+",username："+username+",roles："+roles);
+
             ServerWebExchange webExchange= exchange.mutate ().request(
                     new Consumer<ServerHttpRequest.Builder>() {
                         @Override
                         public void accept(ServerHttpRequest.Builder builder) {
                             builder.header(REQUEST_HEADER_USER_INFO, userInfo);
+                            builder.header(REQUEST_HEADER_USER_ID, userInfo);
+                            builder.header(REQUEST_HEADER_USER_NAME, username);
+                            builder.header(REQUEST_HEADER_USER_AUTHORITIES, roles);
+                            builder.header(REQUEST_HEADER_USER_ENABLED, "true");
                         }
                     }).build();
         } catch (Exception e) {

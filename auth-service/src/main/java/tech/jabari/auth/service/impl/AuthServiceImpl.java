@@ -3,14 +3,19 @@ package tech.jabari.auth.service.impl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import tech.jabari.auth.entity.UserAuth;
 import tech.jabari.auth.service.AuthService;
 import tech.jabari.auth.util.JwtTokenUtil;
 import tech.jabari.common.result.Result;
+import tech.jabari.common.security.UserAuth;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.stream.Collectors;
+
+import static tech.jabari.common.constant.CommonConstants.*;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -24,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     }
     
     @Override
-    public Result<String> login(String username, String password) {
+    public Result<String> login(String username, String password, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken authenticationToken = 
             new UsernamePasswordAuthenticationToken(username, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
@@ -32,6 +37,14 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserAuth userAuth = (UserAuth) (authentication.getPrincipal());
         String token = jwtTokenUtil.generateToken(userAuth, userAuth.getUserId());
+
+        // 手动设置响应头
+        response.setHeader(REQUEST_HEADER_USER_ID, userAuth.getUserId().toString());
+        response.setHeader(REQUEST_HEADER_USER_NAME, userAuth.getUsername());
+        response.setHeader(REQUEST_HEADER_USER_ENABLED, String.valueOf(userAuth.isEnabled()));
+        response.setHeader(REQUEST_HEADER_USER_AUTHORITIES, userAuth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(",")));
         return Result.success(token);
     }
     

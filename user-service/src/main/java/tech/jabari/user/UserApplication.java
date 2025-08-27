@@ -19,4 +19,5 @@ public class UserApplication {
         String port = ctx.getEnvironment().getProperty("server.port");
         System.out.println("-----用户服务启动成功，端口号为："+port );
     }
+
 }

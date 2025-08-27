@@ -2,12 +2,15 @@ package tech.jabari.auth.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import tech.jabari.auth.service.AuthService;
 import tech.jabari.common.result.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import tech.jabari.common.security.SecurityUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,8 +22,10 @@ public class AuthController {
     
     @PostMapping("/login")
     @ApiOperation("用户登录")
-    public Result<String> login(@RequestParam String username, @RequestParam String password) {
-        return authService.login(username, password);
+    public Result<String> login(@RequestParam("username") String username,
+                                @RequestParam("password") String password,
+                                HttpServletResponse response) {
+        return authService.login(username, password,response);
     }
     
     @PostMapping("/logout")
@@ -34,4 +39,17 @@ public class AuthController {
     public Result<String> refreshToken(@RequestParam String token) {
         return authService.refreshToken(token);
     }
+
+
+    @GetMapping("/security")
+    @PreAuthorize("isAuthenticated()") // 测试方法级安全
+    public String testSecurity() {
+        return "Security working! User: " + SecurityUtils.getCurrentUsername();
+    }
+
+    @GetMapping("/public")
+    public String publicEndpoint() {
+        return "This is public";
+    }
+
 }

@@ -4,15 +4,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * 商品服务启动类
  *
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"tech.jabari.product","tech.jabari.common"})
+//@ComponentScan(basePackages = {"tech.jabari.product","tech.jabari.common"})
 @EnableDiscoveryClient
+//@EnableGlobalMethodSecurity(prePostEnabled = true) // 开启方法权限控制 , prePostEnabled = true 表示开启权限控注解的PreAuthorize
 public class ProductApp
 {
     public static void main( String[] args )

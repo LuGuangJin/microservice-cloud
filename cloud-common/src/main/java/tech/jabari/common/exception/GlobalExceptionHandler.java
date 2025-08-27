@@ -1,16 +1,17 @@
 package tech.jabari.common.exception;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tech.jabari.common.result.Result;
 
 import javax.validation.ConstraintViolationException;
 
-@RestControllerAdvice
+//@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
@@ -50,4 +51,16 @@ public class GlobalExceptionHandler {
         String error = "参数类型不匹配错误: " + ex.getName() + " 应为 " + ex.getRequiredType().getSimpleName() + " 但收到 " + ex.getValue();
         return Result.fail(400, error);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
+        return Result.fail(403, "拒绝访问！");
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public Result<Void> handleAuthenticationException(AuthenticationException e) {
+        return Result.fail(401, "认证失败！");
+    }
+
+
 }

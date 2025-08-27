@@ -1,0 +1,33 @@
+package tech.jabari.api.config;
+
+import feign.Logger;
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import org.springframework.context.annotation.Bean;
+import tech.jabari.common.util.UserContext;
+
+import static tech.jabari.common.constant.CommonConstants.REQUEST_HEADER_USER_INFO;
+
+public class DefaultFeignConfig {
+
+    //定义feign请求拦截器，设置用户信息
+    @Bean
+    public RequestInterceptor requestInterceptor(){
+        return new RequestInterceptor() {
+            @Override
+            public void apply(RequestTemplate template) {
+                System.out.println("------------feign请求拦截器被调用-------");
+                Long userId = UserContext.getUser();
+                if(userId!= null){
+                    template.header(REQUEST_HEADER_USER_INFO, userId.toString());
+                }
+            }
+        };
+    }
+
+    //配置feign的日志级别
+    @Bean
+    public Logger.Level feignLoggerLevel(){
+        return Logger.Level.FULL;
+    }
+}

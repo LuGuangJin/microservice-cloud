@@ -22,6 +22,10 @@ spring:
             - Path=/api/auth/**
           filters:
             - StripPrefix=1
+            - RemoveRequestHeader=X-User-Id
+            - RemoveRequestHeader=X-User-Name
+            - RemoveRequestHeader=X-User-Enabled
+            - RemoveRequestHeader=X-User-Authorities
             - name: CustomRequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 5
@@ -73,6 +77,9 @@ spring:
     port: 6379       # Redis端口
     password: 123456
     database: 0      # 数据库索引
+#  main:
+#    web-application-type: reactive # 使用Reactive模式
+#    allow-bean-definition-overriding: true # 允许覆盖bean的定义
 
 jwt:
   secret: ${JWT_SECRET:jabari-tech-secret-key}
@@ -89,7 +96,7 @@ auth:
     - /api/search/**
     - /api/auth/login
     - /api/auth/refresh
-    - /api/product/**
+#    - /api/product/**
     - /v2/api-docs/**
     - /v3/api-docs/**
     - /swagger-resources/**

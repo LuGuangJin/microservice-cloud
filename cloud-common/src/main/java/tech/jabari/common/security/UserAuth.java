@@ -1,4 +1,4 @@
-package tech.jabari.auth.entity;
+package tech.jabari.common.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;

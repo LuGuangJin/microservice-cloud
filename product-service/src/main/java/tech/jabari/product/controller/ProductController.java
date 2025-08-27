@@ -32,6 +32,7 @@ public class ProductController {
             value = "getProduct",
             blockHandler = "productBlockHandler"
     )
+//    @PreAuthorize("isAuthenticated()") // isAuthenticated()：登录后才能访问
     public Result<ProductDTO> getProductById(@PathVariable("id") Long id) {
         return productService.getProductById(id);
     }

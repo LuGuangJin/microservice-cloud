@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import tech.jabari.api.client.UserFeignClient;
 import tech.jabari.api.dto.AuthUserDTO;
-import tech.jabari.auth.entity.UserAuth;
+import tech.jabari.common.security.UserAuth;
 
 import java.util.List;
 import java.util.stream.Collectors;
