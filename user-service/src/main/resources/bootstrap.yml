@@ -1,7 +1,27 @@
 spring:
+  application:
+    name: user-service
   cloud:
     nacos:
-      discovery:
-        enabled: true
-        register-enabled: true
-        ephemeral: true  # 是否临时实例（默认true，宕机自动剔除）
+      server-addr: 127.0.0.1:8848
+      config:
+        file-extension: yaml # 配置文件后缀名
+        shared-configs: # 共享配置
+          - dataId: shared-jdbc.yaml # 共享数据库配置
+          - dataId: shared-log.yaml # 共享日志配置
+          - dataId: shared-swagger.yaml # 共享Swagger配置
+
+    sentinel:
+      transport:
+        dashboard: localhost:8858
+        port: 8719
+      datasource:
+        degrade-rule-ds: # 数据源名称（名称：可以自定义）
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-sentinel-degrade
+            groupId: DEFAULT_GROUP
+            rule-type: degrade
+
+  profiles:
+    active: dev

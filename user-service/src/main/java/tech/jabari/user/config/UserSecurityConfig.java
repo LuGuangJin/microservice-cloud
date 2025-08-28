@@ -36,7 +36,7 @@ public class UserSecurityConfig /*extends WebSecurityConfigurerAdapter*/ {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authorizeHttpRequests(authz -> authz
-                .antMatchers("/user/username", "/user/roles/{id}","/user/info1/{id}").permitAll() // 这些URL是允许匿名访问的
+                .antMatchers("/user/username", "/user/roles/{id}","/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**","/user/getMaxAmount").permitAll() // 这些URL是允许匿名访问的
                 .anyRequest().authenticated() // 其它的URL需要身份验证
         )// 在 Spring Security过滤器链之前添加自定义过滤器
         .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);

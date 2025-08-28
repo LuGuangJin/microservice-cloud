@@ -3,12 +3,14 @@ package tech.jabari.user.controller;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.jabari.api.dto.AuthUserDTO;
 import tech.jabari.api.dto.UserDTO;
 import tech.jabari.common.result.Result;
 import tech.jabari.common.security.SecurityUtils;
+import tech.jabari.user.config.UserProperties;
 import tech.jabari.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -17,13 +19,20 @@ import java.util.List;
 // 控制器
 @RestController
 @RequestMapping("/user")
+@EnableConfigurationProperties(UserProperties.class)
 public class UserController {
+
+    @Autowired
+    private UserProperties userProperties;
 
     @Autowired
     private UserService userService;
 
     @Value("${server.port}")
     private String port;
+
+//    @Value("${jabari.user.maxAmount}")
+//    private String maxAmount;
 
     
     @GetMapping("/{id}")
@@ -74,6 +83,18 @@ public class UserController {
     List<String> selectRolesByUserId(@PathVariable("id") Long id){
         List<String> roles = userService.selectRolesByUserId(id);
         return roles;
+    }
+
+
+    /**
+     * 获取用户数量最大值
+     * @return
+     */
+    @GetMapping("/getMaxAmount")
+    @ApiOperation("获取用户数量最大值")
+    public Result<String> getMaxAmount() {
+        int maxAmount = userProperties.getMaxAmount();
+        return Result.success("----用户数量的最大值为：" + maxAmount);
     }
     
 

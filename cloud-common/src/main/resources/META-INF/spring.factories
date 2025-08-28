@@ -1,7 +1,7 @@
 # src/main/resources/META-INF/spring.factories
 # Spring Boot Auto Configuration
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  tech.jabari.common.config.SwaggerConfig,\
+  tech.jabari.common.config.SwaggerAutoConfig,\
   tech.jabari.common.config.MyBatisConfig,\
   tech.jabari.common.config.JsonConfig,\
   tech.jabari.common.config.MvcConfig,\
